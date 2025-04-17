@@ -10,8 +10,8 @@ const timeouts = {
         step: Duration.ofSeconds(30),                       // how long to wait for a Cucumber step to complete
     },
     playwright: {
-        defaultNavigationTimeout: Duration.ofSeconds(10),   // how long to wait for a page to load
-        defaultTimeout:           Duration.ofSeconds(5),    // how long to wait for an element to show up
+        defaultNavigationTimeout: Duration.ofSeconds(20),   // how long to wait for a page to load
+        defaultTimeout:           Duration.ofSeconds(15),    // how long to wait for an element to show up
     },
     serenity: {
         cueTimeout:               Duration.ofSeconds(5),    // how long to wait for Serenity/JS to complete any post-test activities, like saving screenshots and reports
@@ -27,15 +27,17 @@ BeforeAll(async () => {
     // Launch the browser once before all the tests
     // Serenity/JS will take care of managing Playwright browser context and browser tabs.
     browser = await playwright.chromium.launch({
-        headless: true,
+        headless: false,
     });
+
+    // Create a context with a large viewport (simulate maximized window)
 
     // Configure Serenity/JS
     configure({
 
         // Configure Serenity/JS actors to use Playwright browser
         actors: new Actors(browser, {
-            baseURL:                    'https://the-internet.herokuapp.com/',
+            baseURL:                    'https://ecommerce-playground.lambdatest.io/',
             defaultNavigationTimeout:   timeouts.playwright.defaultNavigationTimeout.inMilliseconds(),
             defaultTimeout:             timeouts.playwright.defaultTimeout.inMilliseconds(),
         }),
@@ -44,8 +46,8 @@ BeforeAll(async () => {
         crew: [
             [ '@serenity-js/console-reporter', { theme: 'auto' } ],
             [ '@serenity-js/web:Photographer', {
-                // strategy: 'TakePhotosOfInteractions',    // capture screenshots of all the interactions; slower but more comprehensive
-                strategy: 'TakePhotosOfFailures',           // capture screenshots of failed interactions; much faster
+                strategy: 'TakePhotosOfInteractions',    // capture screenshots of all the interactions; slower but more comprehensive
+                //strategy: 'TakePhotosOfFailures',           // capture screenshots of failed interactions; much faster
             } ],
             [ '@serenity-js/core:ArtifactArchiver', { outputDirectory: path.resolve(__dirname, '../../target/site/serenity') } ],
             [ '@serenity-js/serenity-bdd', { specDirectory: path.resolve(__dirname, '../../features') } ],
